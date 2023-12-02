@@ -1,0 +1,8 @@
+Notes:
+
+Solution 2 (second part) is written pretty lazily.  Can be cleaned up a bit, and both
+scan functions could be combined to one.
+
+This one was tricky.  Multiple attempts at the send part until it was realized that 
+you really needed to work backwards on the line based on how the numbers were 
+actually parsed.
