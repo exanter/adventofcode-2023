@@ -40,10 +40,11 @@ func (p *PartNum) printPart() {
 type Symbol struct {
     row, col int
     stype byte
+    pgear bool
 }
 
 func main() {
-    var rowct, colct, finalSum int = 0, 0, 0
+    var rowct, colct, finalSum, finalProduct int = 0, 0, 0, 0
     var parts []PartNum
     var symbols []Symbol
 
@@ -88,47 +89,39 @@ func main() {
                 } 
 
                 if rune(schematic[x][y]) != '.' {
-                    newsym := Symbol{row: x, col: y, stype: schematic[x][y]}
+                    newsym := Symbol{row: x, col: y, stype: schematic[x][y], pgear: false}
+                    if rune(schematic[x][y]) == '*' { newsym.pgear = true }
+
                     symbols = append(symbols, newsym)
                 }
             }
         }
     }
 
+    gears := map[Symbol][]int {}
     pct := 0
     for pidx, part := range(parts) {
-        sct := 0
-
         for _, sym := range(symbols) {
             if sym.row >= (part.row-1) && sym.row <= (part.row+1) {
                 if sym.col >= (part.col-1) && sym.col <= (part.col+part.numdigits) {
                     parts[pidx].valid = true
+                    finalSum += parts[pidx].convertDigit()
+                    if sym.stype == '*' {
+                        gears[sym] = append(gears[sym], parts[pidx].convertDigit())
+                    }
                 }
             }
-
-            sct++
         }
 
         pct++
     }
 
-    pct = 0
-    for _, part := range(parts) {
-        if part.valid {
-            finalSum += part.convertDigit()
+    for _, g := range(gears) {
+        if len(g) == 2 {
+            finalProduct += (g[0] * g[1])
         }
-
-        pct++
     }
 
-    /*
-    pct = 0
-    for _, sym := range(symbols) {
-        fmt.Printf("Symbol %d found: ", pct+1)
-        fmt.Printf("at %d,%d: %c\n", sym.row, sym.col, sym.stype)
-        pct++
-    }
-    */
-
-    fmt.Printf("FinalSum: %d\n", finalSum)
+    fmt.Printf("Part 1 - FinalSum: %d\n", finalSum)
+    fmt.Printf("Part 2 - FinalProduct: %d\n", finalProduct)
 }
